@@ -9,36 +9,19 @@ function [y, y_title] = transmitter(x, t)
 y_title = '3 Hz sampling, 4 uniform quantisation levels, PCM, BPSK, raised cosine filter, DSBSC';
 
 % Take 301 samples of the 100 s signal, giving a sample rate of 3 Hz
-samples = sample(x,2.5*t(end)+1);
-
-% Choose quantisation levels
-
-% Uniform quantiser for signals in the range -1 to 1
-%quantisation_levels = [-0.5 0.5];
-%quantisation_levels = [-0.75 -0.25 0.25 0.75];
-%quantisation_levels = [-0.875 -0.625 -0.375 -0.125 0.125 0.375 0.625 0.875];
-
-% Uniform quantiser for Gaussian distributed random signals having a mean of zero and a variance of 1
-%quantisation_levels = [-1 1];
-%quantisation_levels = [-1.5 -0.5 0.5 1.5];
-%quantisation_levels = [-1.75 -1.25 -0.75 -0.25 0.25 0.75 1.25 1.75];
-
-% Lloyd-Max quantiser for sinusoidal signals having an amplitude of A=1
-%quantisation_levels = [-0.6366 0.6366]; 
-%quantisation_levels = [-0.8541 -0.2972 0.2972 0.8541]; 
-%quantisation_levels = [-0.9388 -0.6985 -0.4279 -0.1440 0.1440 0.4279 0.6985 0.9388];
+samples = sample(x,4.5*t(end)+1);
 
 % Lloyd-Max quantiser for Gaussian distributed random signals having a mean of zero and a variance of 1
 %quantisation_levels = [-0.7979 0.7979]; 
-%quantisation_levels = [-1.5104 -0.4528 0.4528 1.5104];
-quantisation_levels = [-2.1520 -1.3439 -0.7560 -0.2451 0.2451 0.7560 1.3439 2.1520];
+quantisation_levels = [-1.5104 -0.4528 0.4528 1.5104];
+%quantisation_levels = [-2.1520 -1.3439 -0.7560 -0.2451 0.2451 0.7560 1.3439 2.1520];
 %quantisation_levels = [-2.7326 -2.0690 -1.6181 -1.2562 -0.9423 -0.6568 -0.3880 -0.1284 0.1284 0.3880 0.6568 0.9423 1.2562 1.6181 2.0690 2.7326];
 
 % Quantise the samples using 4 uniform quantisation levels
 symbols = quantise(samples,quantisation_levels);
 
 % PCM encode the symbols using 2 bits per symbol
-bits = pcm_encode(symbols, 4);
+bits = pcm_encode(symbols,2);
 
 % BPSK modulate the bits
 I = 2*bits - 1;
@@ -54,17 +37,12 @@ y = desample(I, t);
 y = raised_cosine_filter(y,t,f_symbol);
 
 % Normalise and amplify the pulsed-shaped signal
-y = 10*y/sqrt(mean(y.^2));
+y = 55*y/sqrt(mean(y.^2));
+y = low_pass_filter(y,t,5.2);
 
 % DSBSC modulate the pulse-shaped signal onto a 10 Hz carrier
-k_am = 3;
+y = y.*cos(2*pi*10*t);
 
-y = k_am*y.*cos(2*pi*8*t);
-
-y(y>4.9)=4.9;
-
-y = low_pass_filter(y,t,14);
-y = high_pass_filter(y,t,5.5);
 
 
 
