@@ -30,6 +30,7 @@ f_s = 10;
 % Uniform quantiser for Gaussian distributed random signals having a mean of zero and a variance of 1
 %quantisation_levels = [-1 1];
 %quantisation_levels = [-1.5 -0.5 0.5 1.5];
+
 %quantisation_levels = [-1.75 -1.25 -0.75 -0.25 0.25 0.75 1.25 1.75];
 
 % Lloyd-Max quantiser for sinusoidal signals having an amplitude of A=1
